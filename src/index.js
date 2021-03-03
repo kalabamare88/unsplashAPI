@@ -1,12 +1,37 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-import './index.css';
-import App from './App';
-import * as serviceWorker from './serviceWorker';
+import unsplash from './api/unsplash'
 
-ReactDOM.render(<App />, document.getElementById('root'));
+import ImageList from './ImageList'
+import App from './App'
 
-// If you want your app to work offline and load faster, you can change
-// unregister() to register() below. Note this comes with some pitfalls.
-// Learn more about service workers: https://bit.ly/CRA-PWA
-serviceWorker.unregister();
+class Index extends React.Component {
+    state = {images: []};
+
+    callMeBack = async (term) => {
+        const response = await unsplash.get('/search/photos', {
+            params: {
+                query: term
+            }
+
+        });
+        this.setState({images: response.data.results})
+
+
+    };
+
+    render() {
+        return (
+            <div>
+                <App onSubmission={this.callMeBack}/>
+                <div className="ui container" style={{margin : "20px"}}>Found {this.state.images.length} images;</div>
+
+                <div className="ui container"><ImageList images={this.state.images}/></div>
+
+            </div>
+        );
+    }
+
+}
+
+ReactDOM.render(<Index/>, document.querySelector('#root'));
